@@ -117,11 +117,11 @@ bool WifiStatusCheck( struct repeating_timer *rt){
 
 
 void setup() {
-
+ 
+  SetupCOM();
   SetupSwitch();     //initializing switch
   ReadSwitch();      //reading switch position
 
-  SetupCOM();
    if( IMUinit )
   {
     SetupIMU();
@@ -131,20 +131,20 @@ void setup() {
   {
     SetupBMP();
   }
-  
+
   SetupLed();
 
   SetupWifi();
 
   // attaching functions which are to be called after specified amoount of time
-
-
   ITimer1.attachInterruptInterval(INTERVAL_1MS  * 1   , UpdateSensorData ); // called after 1 milli sec
   
-  ITimer3.attachInterruptInterval(INTERVAL_1US  * 900   , SendUDPData);       //called after  5 milli sec
+  ITimer3.attachInterruptInterval(INTERVAL_1US  * 900   , SendUDPData);     //called after  900 micro secs
   
   ITimer2.attachInterruptInterval(INTERVAL_1SEC * 15  , WifiStatusCheck );  //called after 15 seconds
   
+
+
 }
 
 void loop() {

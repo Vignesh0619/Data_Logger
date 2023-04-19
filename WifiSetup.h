@@ -15,8 +15,8 @@ int wifi_status       = WL_IDLE_STATUS;
 
 long int  WifiTicks   = 0 ;    // when this variable reaches a multiple of 2000 it means that approx 10 secs have passed 
 
-char ssid[]   = "test";
-char pass[]   = "password";
+char ssid[]   = "test";           // user id for the hotspot
+char pass[]   = "password";       // password for the hotspot
 
 AsyncUDP udp;
 
