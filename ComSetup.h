@@ -14,8 +14,9 @@ void SetupCOM()
   
   Wire.setClock(1000000);
   
-  // Serial.begin(38400);     // not compulsory to start Serial
+  //  Serial.begin(38400);     // not compulsory to start Serial
     
-  // while(!Serial);
+  //  while(!Serial);
+   
   coms_setup_status=1;
 }

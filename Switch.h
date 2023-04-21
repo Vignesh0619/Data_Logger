@@ -32,6 +32,6 @@ void ReadSwitch()
       Currentinit = (bool) gpio_get(19);  //gpio_get() will give the level of a particular gpio pin 
       RTDinit     = (bool) gpio_get(20);  //gpio_get() will give the level of a particular gpio pin 
       
-      SwitchState =( ( IMUinit * 10000 ) + ( BMPinit * 1000 ) + ( INAinit * 100 ) + ( Voltinit * 10 ) + ( RTDinit * 1 ) ) ;
+      SwitchState =( ( IMUinit * 10000 ) + ( BMPinit * 1000 ) + ( INAinit * 100 ) + ( Currentinit * 10 ) + ( RTDinit * 1 ) ) ;
  
 }
