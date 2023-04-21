@@ -4,13 +4,14 @@
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"  
 
-bool enable = true ;
 
-bool volatile IMUinit  = false;   // if flase Sensor data will not be transmitter; if true sensor data will be transmitter               
-bool volatile BMPinit  = false;   // if flase Sensor data will not be transmitter; if true sensor data will be transmitter
-bool volatile INAinit  = false;   // if flase Sensor data will not be transmitter; if true sensor data will be transmitter
-bool volatile Voltinit = false;   // if flase Sensor data will not be transmitter; if true sensor data will be transmitter
-bool volatile RTDinit  = false;   // if flase Sensor data will not be transmitter; if true sensor data will be transmitter
+bool volatile IMUinit     = false;   // if flase Sensor data will not be transmitter; if true sensor data will be transmitter               
+bool volatile BMPinit     = false;   // if flase Sensor data will not be transmitter; if true sensor data will be transmitter
+bool volatile INAinit     = false;   // if flase Sensor data will not be transmitter; if true sensor data will be transmitter
+bool volatile Currentinit = false;   // if flase Sensor data will not be transmitter; if true sensor data will be transmitter
+bool volatile RTDinit     = false;   // if flase Sensor data will not be transmitter; if true sensor data will be transmitter
+
+int volatile SwitchState    = 0 ;
 
 void SetupSwitch()
 {
@@ -25,10 +26,12 @@ void SetupSwitch()
 void ReadSwitch()
 {  
    
-      IMUinit  = (bool) gpio_get(16);  //gpio_get() will give the level of a particular gpio pin 
-      BMPinit  = (bool) gpio_get(17);  //gpio_get() will give the level of a particular gpio pin 
-      INAinit  = (bool) gpio_get(18);  //gpio_get() will give the level of a particular gpio pin 
-      Voltinit = (bool) gpio_get(19);  //gpio_get() will give the level of a particular gpio pin 
-      RTDinit  = (bool) gpio_get(20);  //gpio_get() will give the level of a particular gpio pin 
+      IMUinit     = (bool) gpio_get(16);  //gpio_get() will give the level of a particular gpio pin 
+      BMPinit     = (bool) gpio_get(17);  //gpio_get() will give the level of a particular gpio pin 
+      INAinit     = (bool) gpio_get(18);  //gpio_get() will give the level of a particular gpio pin 
+      Currentinit = (bool) gpio_get(19);  //gpio_get() will give the level of a particular gpio pin 
+      RTDinit     = (bool) gpio_get(20);  //gpio_get() will give the level of a particular gpio pin 
+      
+      SwitchState =( ( IMUinit * 10000 ) + ( BMPinit * 1000 ) + ( INAinit * 100 ) + ( Voltinit * 10 ) + ( RTDinit * 1 ) ) ;
  
 }

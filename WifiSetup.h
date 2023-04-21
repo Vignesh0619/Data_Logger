@@ -32,7 +32,7 @@ void SetupWifi()
     WifiTicks++;
     if(WifiTicks == 20)
     {
-      WiFi.mode(WIFI_STA);
+      //WiFi.mode(WIFI_STA);
       WiFi.begin(ssid , pass);
     }
     // Connect to WPA/WPA2 network
@@ -48,6 +48,6 @@ void SetupWifi()
  {
     digitalWrite( GreenLed , LOW); 
     digitalWrite( RedLed , HIGH );
-    WiFi.mode(WIFI_STA);
+    //WiFi.mode(WIFI_STA);
     WiFi.begin(ssid , pass);
  }

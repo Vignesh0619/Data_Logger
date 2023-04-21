@@ -10,17 +10,17 @@ typedef struct{
 
 Profiler Profile ;
 
-void CalculateTi()
+void getTi()
 {
     Profile.Ti=to_us_since_boot(get_absolute_time());
 }
 
-void calculateTf()
+void getTf()
 {
     Profile.Tf=to_us_since_boot(get_absolute_time());
 }
 
-void calculateDeltaT()
+void getDeltaT()
 {
     Profile.DeltaT = Profile.Tf - Profile.Ti;
     Serial.println(Profile.DeltaT);

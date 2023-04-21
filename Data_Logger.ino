@@ -19,6 +19,10 @@
 #include "Led.h"
 #include "hardware/timer.h"
 #include "RPi_Pico_TimerInterrupt.h"
+#include "pico/multicore.h"
+#include "hardware/i2c.h"
+#include "pico/binary_info.h"
+#include "AnalogSetup.h"
 
 #define INTERVAL_1US    1
 #define INTERVAL_1MS    1e3       // counting in us
@@ -41,7 +45,9 @@ String dataString  = String("");
 bool SendUDPData(struct repeating_timer *rt){
     if( WiFi.status() == WL_CONNECTED)
    {  
-    dataString += String( (float) TimeStamp.CurrentTime,3);
+        dataString += String( SwitchState);
+        dataString += String("|");
+        dataString += String( (float) TimeStamp.CurrentTime,3);
 
     if(IMUinit)
     {
@@ -67,6 +73,13 @@ bool SendUDPData(struct repeating_timer *rt){
         dataString += String(bmp_data.temp,1);
     }
 
+      dataString += String("|");
+      dataString += String(AnalogValue.pin26);
+      dataString += String("|");
+      dataString += String(AnalogValue.pin27);
+      dataString += String("|");
+      dataString += String(AnalogValue.pin28);
+      
       udp.broadcastTo(dataString.c_str(),2312);   
     
    }
@@ -88,6 +101,10 @@ bool UpdateSensorData(struct repeating_timer *rt){
       UpdateImuData();
 
   TimeStamp.CurrentTime = getTimeStamp();
+  
+  getADC26();
+  getADC27();
+  getADC28();
   
   if( WiFi.status() == WL_CONNECTED && digitalRead(RedLed) )
   {
@@ -133,20 +150,23 @@ void setup() {
   }
 
   SetupLed();
-
-  SetupWifi();
-
-  // attaching functions which are to be called after specified amoount of time
-  ITimer1.attachInterruptInterval(INTERVAL_1MS  * 1   , UpdateSensorData ); // called after 1 milli sec
   
-  ITimer3.attachInterruptInterval(INTERVAL_1US  * 900   , SendUDPData);     //called after  900 micro secs
+  ITimer3.attachInterruptInterval(INTERVAL_1US  * 1000   , SendUDPData);     //called after  900 micro secs
   
-  ITimer2.attachInterruptInterval(INTERVAL_1SEC * 15  , WifiStatusCheck );  //called after 15 seconds
-  
-
-
 }
 
+void setup1()
+{
+    SetupADC();
+    
+    SetupWifi();
+
+  // attaching functions which are to be called after specified amoount of time
+
+  ITimer2.attachInterruptInterval(INTERVAL_1SEC * 15  , WifiStatusCheck );  //called after 15 seconds
+
+  ITimer1.attachInterruptInterval(INTERVAL_1MS  * 1   , UpdateSensorData ); // called after 1 milli sec
+}
 void loop() {
 
     free_hits++;    
