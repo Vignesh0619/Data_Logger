@@ -151,7 +151,7 @@ void setup() {
 
   SetupLed();
   
-  ITimer3.attachInterruptInterval(INTERVAL_1US  * 1000   , SendUDPData);     //called after  900 micro secs
+  ITimer3.attachInterruptInterval(INTERVAL_1US  * 900   , SendUDPData);     //called after  900 micro secs
   
 }
 
