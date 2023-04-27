@@ -21,8 +21,8 @@
 #include "RPi_Pico_TimerInterrupt.h"
 #include "pico/multicore.h"
 #include "hardware/i2c.h"
-#include "pico/binary_info.h"
-#include "AnalogSetup.h"
+#include "pico/binary_info.h" 
+#include "RTD.h"
 
 #define INTERVAL_1US    1
 #define INTERVAL_1MS    1e3       // counting in us
@@ -47,7 +47,7 @@ bool SendUDPData(struct repeating_timer *rt){
    {  
         dataString += String( SwitchState);
         dataString += String("|");
-        dataString += String( (float) TimeStamp.CurrentTime,3);
+        dataString += String( (int) TimeStamp.CurrentTime);
 
     if(IMUinit)
     {
@@ -73,13 +73,12 @@ bool SendUDPData(struct repeating_timer *rt){
         dataString += String(bmp_data.temp,1);
     }
 
-      dataString += String("|");
-      dataString += String(AnalogValue.pin26);
-      dataString += String("|");
-      dataString += String(AnalogValue.pin27);
-      dataString += String("|");
-      dataString += String(AnalogValue.pin28);
-      
+    if(RTDinit)
+    {
+       dataString += String("|");
+       dataString += String(RTD_data.temperature);
+    }
+
       udp.broadcastTo(dataString.c_str(),2312);   
     
    }
@@ -100,11 +99,10 @@ bool UpdateSensorData(struct repeating_timer *rt){
   if(IMUinit)
       UpdateImuData();
 
+  if(RTDinit)
+      getRTDTemp();
+
   TimeStamp.CurrentTime = getTimeStamp();
-  
-  getADC26();
-  getADC27();
-  getADC28();
   
   if( WiFi.status() == WL_CONNECTED && digitalRead(RedLed) )
   {
@@ -148,7 +146,7 @@ void setup() {
   {
     SetupBMP();
   }
-
+  
   SetupLed();
   
   ITimer3.attachInterruptInterval(INTERVAL_1US  * 900   , SendUDPData);     //called after  900 micro secs
@@ -156,10 +154,14 @@ void setup() {
 }
 
 void setup1()
-{
-    SetupADC();
-    
-    SetupWifi();
+{   
+  if(RTDinit)
+  {
+    SetupRTD();
+  }
+
+
+   SetupWifi();
 
   // attaching functions which are to be called after specified amoount of time
 

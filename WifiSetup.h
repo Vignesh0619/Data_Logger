@@ -25,7 +25,6 @@ void SetupWifi()
     digitalWrite( RedLed , HIGH );
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid , pass);
-    
     while ( WiFi.status() != WL_CONNECTED)
   {
     delay(500);
