@@ -6,7 +6,6 @@
 #include "hardware/clocks.h"
 #include "hardware/structs/pll.h"
 #include "hardware/structs/clocks.h"
-
 typedef struct {
  uint32_t CurrentTime  ;
  uint32_t Offset       ;

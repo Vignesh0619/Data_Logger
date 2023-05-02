@@ -15,7 +15,6 @@ void SetupRTD()
 {
   adc_init();
   adc_gpio_init(26);
-
 }
 
 void getRTDTemp()

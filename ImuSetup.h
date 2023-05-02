@@ -10,17 +10,23 @@ int imu_setup_status=0;     // if 0 setup not complete; 1 setup complete
 
 sensors_event_t a, g, temp;
 
+/*
+the data obtained by using the sensor lbrary will be in decimal but we will mutliply
+by 10/100 as per  the no.of decimal places we want and store that value as int
+*/
+
+
 typedef struct {
-  float acc_x;
-  float acc_y;
-  float acc_z;
-  float gyro_x;
-  float gyro_y;
-  float gyro_z;
-  float temp;
+  int acc_x;
+  int acc_y;
+  int acc_z;
+  int gyro_x;
+  int gyro_y;
+  int gyro_z;
+  int temp;
 } IMU_DATA;                     // a struct to store Imu data and allow global access to them
 
-volatile IMU_DATA imu_data = {0.0};
+volatile IMU_DATA imu_data = {0};
 
 void SetupIMU(void) {
 
@@ -97,10 +103,16 @@ void UpdateImuData() {
   /* Get new sensor events with the readings */
   mpu.getEvent(&a, &g, &temp);  // has to be called everytime to get new sensor readings
   
-  imu_data.acc_x  = a.acceleration.x;
-  imu_data.acc_y  = a.acceleration.y;
-  imu_data.acc_z  = a.acceleration.z;
-  imu_data.gyro_x = g.gyro.x;
-  imu_data.gyro_y = g.gyro.y;
-  imu_data.gyro_z = g.gyro.z; 
+  //
+  // Since data is being sent through a struct which has all it member variables
+  // int16_t or similar we will multiply the required sensor data with 10/100 etc 
+  // based on the precision(i.e no of decimal places we want)
+  // the plotter will then convert it into double
+  //
+  SensorData.acc_x  = a.acceleration.x*100;
+  SensorData.acc_y  = a.acceleration.y*100;
+  SensorData.acc_z  = a.acceleration.z*100;
+  SensorData.gyro_x = g.gyro.x*100;
+  SensorData.gyro_y = g.gyro.y*100;
+  SensorData.gyro_z = g.gyro.z*100; 
 }
