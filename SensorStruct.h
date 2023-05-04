@@ -10,7 +10,7 @@ typedef struct{
      int16_t  gyro_x;
      int16_t  gyro_y;
      int16_t  gyro_z;
-     int16_t  pressure;
+     uint32_t  pressure;
      int16_t  temp;
      int16_t  RTDTemp;
      int16_t  mag_x;
