@@ -80,23 +80,23 @@ bool UpdateSensorData(struct repeating_timer *rt){
 
   if(BMPinit) 
         UpdateBmpData();
-
   if(IMUinit)
       UpdateImuData();     
 
   if(RTDinit)
       getRTDTemp();
 
-   SensorData.time = getTimeStamp();
+
+  SensorData.time = getTimeStamp();
+
   
   if( WiFi.status() == WL_CONNECTED && digitalRead(RedLed) )
   {
     digitalWrite( RedLed   , LOW  );
     digitalWrite( GreenLed , HIGH );
   }
-  
+
   ITimer1.restartTimer();
-  
 
   return true;
 
@@ -133,7 +133,6 @@ void setup() {
     SetupBMP();
   }
   
-  SetupLed();
   
   ITimer3.attachInterruptInterval(INTERVAL_1US  * 900   , SendUDPData);     //called after  900 micro secs
   
@@ -147,11 +146,11 @@ void setup1()
   }
 
 
-   SetupWifi();
+  SetupWifi();
 
   // attaching functions which are to be called after specified amoount of time
 
-  ITimer2.attachInterruptInterval(INTERVAL_1SEC * 15  , WifiStatusCheck );  //called after 15 seconds
+  //ITimer2.attachInterruptInterval(INTERVAL_1SEC * 15  , WifiStatusCheck );  //called after 15 seconds
 
   ITimer1.attachInterruptInterval(INTERVAL_1MS  * 1   , UpdateSensorData ); // called after 1 milli sec
 }

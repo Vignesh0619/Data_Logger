@@ -45,6 +45,6 @@ void UpdateBmpData()
     // the plotter will then convert it into double
     //
     SensorData.pressure = bmp.readPressure();
-    SensorData.temp     = bmp.readTemperature()*10;  
+    SensorData.temp     = bmp.readTemperature()*10;
  
 }
