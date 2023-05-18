@@ -8,13 +8,6 @@
 // the data obtained by using the sensor lbrary will be in decimal but we will mutliply
 // by 10/100 as per  the no.of decimal places we want and store that value as int
 //
-// Struct to access the BMP pressure and temperature data
-typedef struct {         
-  int pressure;
-  int temp;
-} BMP_DATA;
-
-volatile BMP_DATA bmp_data = {0};
 
 Adafruit_BMP280 bmp;        //Struct define in Adafruit bmp library
 int bmp_setup_status=0;     // if 0 setup not complete; 1 setup complete
@@ -32,8 +25,6 @@ void SetupBMP() {
                   Adafruit_BMP280::FILTER_X16,      /* Filtering. */
                   Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
 
-    bmp_setup_status=1;
-
 }
 
 void UpdateBmpData()
@@ -44,7 +35,6 @@ void UpdateBmpData()
     // based on the precision(i.e no of decimal places we want)
     // the plotter will then convert it into double
     //
-    SensorData.pressure = bmp.readPressure();
-    SensorData.temp     = bmp.readTemperature()*10;
- 
+    SensorData.Pressure    = bmp.readPressure();
+    SensorData.Temperature = bmp.readTemperature()*10;
 }
