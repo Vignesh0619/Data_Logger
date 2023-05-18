@@ -6,13 +6,26 @@
 >>>>>>>>>>>>>>>>>>>>>>>>> MACROS <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 */
 #define INTERVAL_1US    1
-#define INTERVAL_1MS    1e3       // counting in us
+#define INTERVAL_1MS    1e3       // counting in ms
 #define INTERVAL_1SEC   1e6       // counting in us
-
 
 #define TIMER_INTERRUPT_DEBUG         1
 #define _TIMERINTERRUPT_LOGLEVEL_     4
 
+#define BNO_PIN  16
+#define BMP_PIN  17
+#define INA_PIN  18
+#define DS18_PIN 15
+#define ACS_PIN  19
+
+#define GREEN_LED  0
+#define RED_LED    1
+
+#define SDA_PIN   12
+#define SCL_PIN   13
+#define I2C_CLOCK 1000000
+
+#define ACTIVATE_SERIAL 1   // set it to 1 if Serial communication is required
 /*
 >>>>>>>>>>>>>>>>>>>>>>> END OF MACROS <<<<<<<<<<<<<<<<<<<<<<<
 */
@@ -36,15 +49,18 @@ volatile Sensor SensorData={0};
 #include "pico/binary_info.h" 
 #include "pico/stdlib.h"
 
+
 #include "BMPSetup.h"
 #include "ComSetup.h"
-#include "ImuSetup.h"
+#include "BNOSetup.h"
 #include "WifiSetup.h"
 #include "ClkSetup.h"
 #include "Switch.h"
 #include "Profiler.h"
 #include "Led.h"
-#include "RTD.h"
+#include "INASetup.h"
+#include "DS18B20Setup.h"
+#include "CurrentSensor.h"
 
 
 
@@ -55,18 +71,17 @@ RPI_PICO_Timer ITimer3(2);        //Timer for sending sensor data over the air
 
 uint32_t free_hits =  0;
 
-IPAddress ip(192,168,2,118);      //reciever ip addrs
-
-//String dataString  = String("");
-
+IPAddress ip(192,168,5,132);      //reciever ip addrs
 
 WiFiUDP Udp;                      // creating an object of type WiFiUDP for sending data
 
-bool SendUDPData(struct repeating_timer *rt){
+int counter =0;
 
+bool SendUDPData(struct repeating_timer *rt){
+      
       if( WiFi.status() == WL_CONNECTED)
   {
-      Udp.beginPacket(ip, 2312); 
+      Udp.beginPacket(ip, 2356); 
       Udp.write((char*)&SensorData,sizeof(SensorData));
       Udp.endPacket();
   }
@@ -79,15 +94,29 @@ bool SendUDPData(struct repeating_timer *rt){
 bool UpdateSensorData(struct repeating_timer *rt){
 
   if(BMPinit) 
-        UpdateBmpData();
+      UpdateBmpData();
+
   if(IMUinit)
-      UpdateImuData();     
+    {
+      UpdateBNOData(); 
+      CalibrateBNO();
+    }
 
-  if(RTDinit)
-      getRTDTemp();
+  if(INAinit)
+     UpdateINAData();
+     
+  if(ACSinit)
+   UpdateCurrent();
 
-
-  SensorData.time = getTimeStamp();
+  if(RTDinit & counter == 100 )
+    {
+      UpdateRTD();
+      counter=0;
+    }
+    counter++;
+  SensorData.Counter = counter;
+  
+  SensorData.Time = getTimeStamp();
 
   
   if( WiFi.status() == WL_CONNECTED && digitalRead(RedLed) )
@@ -95,9 +124,8 @@ bool UpdateSensorData(struct repeating_timer *rt){
     digitalWrite( RedLed   , LOW  );
     digitalWrite( GreenLed , HIGH );
   }
-
-  ITimer1.restartTimer();
-
+  
+ 
   return true;
 
 }
@@ -108,7 +136,7 @@ bool WifiStatusCheck( struct repeating_timer *rt){
   
   if( WiFi.status() != WL_CONNECTED)
   {
-    ReconnectWifi();
+    ReconnectWifi(); 
   }
 
    return true;
@@ -118,44 +146,51 @@ bool WifiStatusCheck( struct repeating_timer *rt){
 
 void setup() {
  
-  SetupCOM();
-  SetupSwitch();     //initializing switch
-  ReadSwitch();      //reading switch position
-  SetupLed();
-
+   SetupCOM();
+   SetupSwitch();     //initializing switch
+   ReadSwitch();      //reading switch position
+   SetupLed();
    if( IMUinit )
   {
-    SetupIMU();
+    SetupBNO();
   }
 
   if( BMPinit )         
   {
     SetupBMP();
   }
+
+  if(INAinit)
+  {
+    SetupINA();
+  }
+
+  if(RTDinit )
+  {
+    SetupRTD();  
+  }
+  if(ACSinit)
+  {
+    SetupCurrent();
+  }
+ 
   
-  
-  ITimer3.attachInterruptInterval(INTERVAL_1US  * 900   , SendUDPData);     //called after  900 micro secs
+  ITimer3.attachInterruptInterval(INTERVAL_1MS  * 1  , SendUDPData);     //called after  900 micro secs
   
 }
 
 void setup1()
 {   
-  if(RTDinit)
-  {
-    SetupRTD();
-  }
-
-
-  SetupWifi();
+   SetupWifi();
 
   // attaching functions which are to be called after specified amoount of time
 
-  //ITimer2.attachInterruptInterval(INTERVAL_1SEC * 15  , WifiStatusCheck );  //called after 15 seconds
+  ITimer2.attachInterruptInterval(INTERVAL_1SEC * 15  , WifiStatusCheck );  //called after 15 seconds
 
   ITimer1.attachInterruptInterval(INTERVAL_1MS  * 1   , UpdateSensorData ); // called after 1 milli sec
 }
 void loop() {
 
-    free_hits++;    
-    
+    free_hits++;
+
 }
