@@ -9,8 +9,7 @@ One_wire one_wire(28);
 void SetupRTD()
 { 
      one_wire.init();
-     one_wire.single_device_read_rom(address);
-      
+     one_wire.single_device_read_rom(address);     
 }
 void UpdateRTD() 
 {             

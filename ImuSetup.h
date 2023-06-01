@@ -2,7 +2,6 @@
 #pragma once
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
-#include "ComSetup.h"
 
 Adafruit_MPU6050 mpu;       // a struct defined in the adafruit MPU library 
 
@@ -109,10 +108,10 @@ void UpdateImuData() {
   // based on the precision(i.e no of decimal places we want)
   // the plotter will then convert it into double
   //
-  SensorData.acc_x  = a.acceleration.x*100;
-  SensorData.acc_y  = a.acceleration.y*100;
-  SensorData.acc_z  = a.acceleration.z*100;
-  SensorData.gyro_x = g.gyro.x*100;
-  SensorData.gyro_y = g.gyro.y*100;
-  SensorData.gyro_z = g.gyro.z*100; 
+  SensorData.AccX  = a.acceleration.x*100;
+  SensorData.AccY  = a.acceleration.y*100;
+  SensorData.AccZ  = a.acceleration.z*100;
+  SensorData.GyroX = g.gyro.x*100;
+  SensorData.GyroY = g.gyro.y*100;
+  SensorData.GyroZ = g.gyro.z*100; 
 }

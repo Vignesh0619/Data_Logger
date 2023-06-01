@@ -14,9 +14,12 @@ void SetupCOM()
   
   Wire.setClock(I2C_CLOCK);
   
+  if(ACTIVATE_SERIAL)
+  {
+  Serial.begin(115200);     // not compulsory to start Serial
+  while(!Serial);
+  }
 
-      //  Serial.begin(115200);     // not compulsory to start Serial
-      //  while(!Serial);
  
   coms_setup_status=1;
 }

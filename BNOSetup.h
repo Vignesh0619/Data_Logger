@@ -8,13 +8,13 @@ sensors_event_t orientationData , angVelocityData , linearAccelData, magnetomete
 uint8_t sys, gyro, accel, mag = 0;
 
 Adafruit_BNO055 bno  = Adafruit_BNO055(55, 0x28, &Wire);
-
 void SetupBNO()
 {
       while(! bno.begin())
     {
 
     }
+
 }
 void CalibrateBNO()
 {  
@@ -26,7 +26,6 @@ void CalibrateBNO()
 }
 void UpdateBNOData()
 {   
- 
   bno.getEvent(&orientationData  , Adafruit_BNO055::VECTOR_EULER);          // gives gyro data in degree
   bno.getEvent(&angVelocityData  , Adafruit_BNO055::VECTOR_GYROSCOPE);      // gives gyro data in deg/s
   bno.getEvent(&linearAccelData  , Adafruit_BNO055::VECTOR_LINEARACCEL);    // acc data without constant acceleration such as gravity
@@ -41,9 +40,9 @@ void UpdateBNOData()
   SensorData.GyroY = angVelocityData.gyro.y * 100;
   SensorData.GyroZ = angVelocityData.gyro.z * 100;
 
-  SensorData.orientationX = orientationData.orientation.x * 10;
-  SensorData.orientationY = orientationData.orientation.y * 10;
-  SensorData.orientationZ = orientationData.orientation.z * 10;
+  SensorData.OrientationX = orientationData.orientation.x * 10;
+  SensorData.OrientationY = orientationData.orientation.y * 10;
+  SensorData.OrientationZ = orientationData.orientation.z * 10;
 
   SensorData.MagX = magnetometerData.magnetic.x * 100;
   SensorData.MagY = magnetometerData.magnetic.y * 100;

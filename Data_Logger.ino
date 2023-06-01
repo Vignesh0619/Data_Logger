@@ -25,7 +25,7 @@
 #define SCL_PIN   13
 #define I2C_CLOCK 1000000
 
-#define ACTIVATE_SERIAL 1   // set it to 1 if Serial communication is required
+#define ACTIVATE_SERIAL 0   // set it to 1 if Serial communication is required
 /*
 >>>>>>>>>>>>>>>>>>>>>>> END OF MACROS <<<<<<<<<<<<<<<<<<<<<<<
 */
@@ -71,17 +71,18 @@ RPI_PICO_Timer ITimer3(2);        //Timer for sending sensor data over the air
 
 uint32_t free_hits =  0;
 
-IPAddress ip(192,168,5,132);      //reciever ip addrs
+IPAddress ip(192,168,137,1);      //reciever ip addrs
 
 WiFiUDP Udp;                      // creating an object of type WiFiUDP for sending data
 
 int counter =0;
+bool SensorSetup=false;
 
 bool SendUDPData(struct repeating_timer *rt){
       
       if( WiFi.status() == WL_CONNECTED)
   {
-      Udp.beginPacket(ip, 2356); 
+      Udp.beginPacket(ip, 2198); 
       Udp.write((char*)&SensorData,sizeof(SensorData));
       Udp.endPacket();
   }
@@ -98,8 +99,8 @@ bool UpdateSensorData(struct repeating_timer *rt){
 
   if(IMUinit)
     {
-      UpdateBNOData(); 
-      CalibrateBNO();
+       UpdateBNOData(); 
+       CalibrateBNO();
     }
 
   if(INAinit)
@@ -108,10 +109,10 @@ bool UpdateSensorData(struct repeating_timer *rt){
   if(ACSinit)
    UpdateCurrent();
 
-  if(RTDinit & counter == 100 )
+  if(RTDinit )
     {
-      UpdateRTD();
-      counter=0;
+       UpdateRTD();
+      // counter=0;
     }
     counter++;
   SensorData.Counter = counter;
@@ -124,7 +125,6 @@ bool UpdateSensorData(struct repeating_timer *rt){
     digitalWrite( RedLed   , LOW  );
     digitalWrite( GreenLed , HIGH );
   }
-  
  
   return true;
 
@@ -150,10 +150,6 @@ void setup() {
    SetupSwitch();     //initializing switch
    ReadSwitch();      //reading switch position
    SetupLed();
-   if( IMUinit )
-  {
-    SetupBNO();
-  }
 
   if( BMPinit )         
   {
@@ -173,24 +169,33 @@ void setup() {
   {
     SetupCurrent();
   }
- 
-  
-  ITimer3.attachInterruptInterval(INTERVAL_1MS  * 1  , SendUDPData);     //called after  900 micro secs
-  
+     if( IMUinit )
+  {
+    SetupBNO();
+  }
+  SensorSetup=true;
+   ITimer3.attachInterruptInterval(INTERVAL_1MS  * 1  , SendUDPData);     //called after  900 micro secs
+
 }
 
 void setup1()
 {   
-   SetupWifi();
+    
 
   // attaching functions which are to be called after specified amoount of time
+    while(!SensorSetup)
+    {
+      //Serial.println("Setting up sensors");
+    }
+    SetupWifi();
+    ITimer1.attachInterruptInterval(INTERVAL_1MS  * 1  , UpdateSensorData ); // called after 1 milli sec
+   
+    ITimer2.attachInterruptInterval(INTERVAL_1SEC * 15 , WifiStatusCheck );  //called after 15 seconds
+     
 
-  ITimer2.attachInterruptInterval(INTERVAL_1SEC * 15  , WifiStatusCheck );  //called after 15 seconds
-
-  ITimer1.attachInterruptInterval(INTERVAL_1MS  * 1   , UpdateSensorData ); // called after 1 milli sec
 }
 void loop() {
 
     free_hits++;
-
+    
 }

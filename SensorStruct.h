@@ -3,28 +3,25 @@
 #include <stdio.h>
 
 typedef struct{
-         uint32_t Time    ;
-    uint32_t  AccX    ;
-    uint32_t  AccY    ;
-    uint32_t  AccZ    ;
-    uint32_t  GyroX   ;
-    uint32_t  GyroY   ;
-    uint32_t  GyroZ   ;
-    uint32_t  Pressure ;
-    uint32_t  Temperature     ;
-    uint32_t  RTDTemp  ;
-    uint32_t  MagX;
-    uint32_t  MagY;
-    uint32_t  MagZ;
-    uint32_t  OrientationX;
-    uint32_t  OrientationY;
-    uint32_t  OrientationZ;
-    uint32_t  LinearAccX;
-    uint32_t  LinearAccY;
-    uint32_t  LinearAccZ;
-    uint32_t  current;
-    uint32_t  BusVoltage;
-    uint32_t  ShuntVoltage;
+    uint32_t Time ;
+    int32_t  AccX ;
+    int32_t  AccY ;
+    int32_t  AccZ ;
+    int32_t  GyroX;
+    int32_t  GyroY;
+    int32_t  GyroZ;
+    int32_t  Pressure ;
+    int32_t  Temperature     ;
+    int32_t  RTDTemp  ;
+    int32_t  MagX;
+    int32_t  MagY;
+    int32_t  MagZ;
+    int32_t  OrientationX;
+    int32_t  OrientationY;
+    int32_t  OrientationZ;
+    int32_t  Current;
+    int32_t  BusVoltage;
+    int32_t  ShuntVoltage;
     uint8_t  AccCalib;
     uint8_t  GyroCalib;
     uint8_t  MagCalib;
