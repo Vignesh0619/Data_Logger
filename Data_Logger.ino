@@ -26,17 +26,17 @@
 #define I2C_CLOCK 1000000
 
 #define ACTIVATE_SERIAL 0   // set it to 1 if Serial communication is required
+
+#define DUMMY_VAL -99
 /*
 >>>>>>>>>>>>>>>>>>>>>>> END OF MACROS <<<<<<<<<<<<<<<<<<<<<<<
 */
 
 
-
 #include <stdio.h>
 #include "SensorStruct.h"
 
-
-volatile Sensor SensorData={0};
+Sensor SensorData={0};
 
 #include <Wire.h>
 #include <WiFi.h>
@@ -76,7 +76,7 @@ IPAddress ip(192,168,137,1);      //reciever ip addrs
 WiFiUDP Udp;                      // creating an object of type WiFiUDP for sending data
 
 int counter =0;
-bool SensorSetup=false;
+bool SensorSetup=false;           // a flag to check if all sensors have been initialized 
 
 bool SendUDPData(struct repeating_timer *rt){
       
@@ -90,33 +90,75 @@ bool SendUDPData(struct repeating_timer *rt){
     return true;
 }
 
-// function to update sensor data regularly
+// function to update sensor data regularly if the user has not selected 
+// a particular sensor -99 will be transmitted.
 
 bool UpdateSensorData(struct repeating_timer *rt){
+  
+  ReadSwitch();
 
   if(BMPinit) 
-      UpdateBmpData();
+  {
+    UpdateBmpData();
+  }
+  else
+  { 
+    SensorData.Pressure =  DUMMY_VAL * 100000;
+    SensorData.Temperature =  DUMMY_VAL * 10   ;
+  }
 
   if(IMUinit)
-    {
-       UpdateBNOData(); 
-       CalibrateBNO();
-    }
+  {
+     UpdateBNOData(); 
+     CalibrateBNO();
+  }
+  else
+  {
+   SensorData.AccX  = DUMMY_VAL * 100;
+   SensorData.AccY  = DUMMY_VAL * 100;
+   SensorData.AccZ  = DUMMY_VAL * 100;
+   SensorData.GyroX = DUMMY_VAL * 100;
+   SensorData.GyroY = DUMMY_VAL * 100;
+   SensorData.GyroZ = DUMMY_VAL * 100;
+   SensorData.MagX = DUMMY_VAL * 10;
+   SensorData.MagY = DUMMY_VAL * 10;
+   SensorData.MagZ = DUMMY_VAL * 10;
+   SensorData.OrientationX = DUMMY_VAL * 10;
+   SensorData.OrientationY = DUMMY_VAL * 10;
+   SensorData.OrientationZ = DUMMY_VAL * 10;
+   SensorData.AccCalib = DUMMY_VAL;
+   SensorData.GyroCalib = DUMMY_VAL;
+   SensorData.MagCalib = DUMMY_VAL;
+   SensorData.SysCalib = DUMMY_VAL;
+  }
 
   if(INAinit)
      UpdateINAData();
+  else
+  {
+   SensorData.BusVoltage = DUMMY_VAL * 100;
+   SensorData.ShuntVoltage= DUMMY_VAL * 100;
+  }
      
   if(ACSinit)
+  {
    UpdateCurrent();
+  }
+  else
+  {
+   SensorData.Current = DUMMY_VAL * 100000;
+  }
 
-  if(RTDinit )
-    {
-       UpdateRTD();
-      // counter=0;
-    }
-    counter++;
-  SensorData.Counter = counter;
-  
+  if(RTDinit)
+  {
+  UpdateRTD();
+  }
+  else
+  {
+   SensorData.RTDTemp =DUMMY_VAL * 10  ;
+  }
+
+
   SensorData.Time = getTimeStamp();
 
   
@@ -125,6 +167,11 @@ bool UpdateSensorData(struct repeating_timer *rt){
     digitalWrite( RedLed   , LOW  );
     digitalWrite( GreenLed , HIGH );
   }
+  SensorData.Counter= counter;
+  if(counter == 50)
+     counter=0;
+  counter++;
+      
  
   return true;
 
@@ -146,56 +193,36 @@ bool WifiStatusCheck( struct repeating_timer *rt){
 
 void setup() {
  
-   SetupCOM();
-   SetupSwitch();     //initializing switch
-   ReadSwitch();      //reading switch position
-   SetupLed();
+  InitializeCOM();        //
+  InitializeSwitch();     //initializing switch
+  ReadSwitch();      //reading switch position
+  InitializeLED();
 
-  if( BMPinit )         
-  {
-    SetupBMP();
-  }
-
-  if(INAinit)
-  {
-    SetupINA();
-  }
-
-  if(RTDinit )
-  {
-    SetupRTD();  
-  }
-  if(ACSinit)
-  {
-    SetupCurrent();
-  }
-     if( IMUinit )
-  {
-    SetupBNO();
-  }
+  InitializeBMP();
+  InitializeINA();
+  InitializeRTD();  
+  InitializeCurrent();
+  InitializeBNO();
+  
   SensorSetup=true;
-   ITimer3.attachInterruptInterval(INTERVAL_1MS  * 1  , SendUDPData);     //called after  900 micro secs
+  ITimer3.attachInterruptInterval(INTERVAL_1MS  * 1  , SendUDPData);     //called after  1 milli sec
 
 }
 
 void setup1()
-{   
-    
-
-  // attaching functions which are to be called after specified amoount of time
-    while(!SensorSetup)
-    {
-      //Serial.println("Setting up sensors");
-    }
-    SetupWifi();
-    ITimer1.attachInterruptInterval(INTERVAL_1MS  * 1  , UpdateSensorData ); // called after 1 milli sec
-   
-    ITimer2.attachInterruptInterval(INTERVAL_1SEC * 15 , WifiStatusCheck );  //called after 15 seconds
+{   // wait till all sensors have been initialized
+  while(!SensorSetup)
+  {
+    //Serial.println("Setting up sensors");
+  }
+  InitializeWifi();
+  
+  ITimer1.attachInterruptInterval(INTERVAL_1MS  * 1  , UpdateSensorData ); // called after 1 milli sec
+  
+  ITimer2.attachInterruptInterval(INTERVAL_1SEC * 15 , WifiStatusCheck );  //called after 15 seconds
      
-
 }
 void loop() {
 
-    free_hits++;
-    
+    free_hits++;  
 }

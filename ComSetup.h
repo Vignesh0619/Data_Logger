@@ -5,7 +5,7 @@
 
 int coms_setup_status=0;   // if 0 setup not complete; 1 setup complete
 
-void SetupCOM()
+void InitializeCOM()
 {
 
   Wire.setSDA(SDA_PIN);          // setting up I2C coms for RPI and MPU comms

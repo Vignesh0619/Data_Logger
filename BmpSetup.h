@@ -12,7 +12,7 @@
 Adafruit_BMP280 bmp;        //Struct define in Adafruit bmp library
 int bmp_setup_status=0;     // if 0 setup not complete; 1 setup complete
 
-void SetupBMP() {  
+void InitializeBMP() {  
   
   unsigned bmp_status;
   bmp_status = bmp.begin(BMP280_ADDRESS_ALT, BMP280_CHIPID);
@@ -37,4 +37,10 @@ void UpdateBmpData()
     //
     SensorData.Pressure    = bmp.readPressure();
     SensorData.Temperature = bmp.readTemperature()*10;
+}
+
+void UpdateDummyBMPData()
+{
+    SensorData.Pressure    = DUMMY_VAL*100000;
+    SensorData.Temperature = DUMMY_VAL*10;
 }

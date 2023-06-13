@@ -9,8 +9,6 @@
 #include <AsyncUDP_RP2040W.h>
 #include "Led.h"
 
-
-int WifiSetupStatus   = 0 ;     // 0 => setup not done 1 => setup done
 int wifi_status       = WL_IDLE_STATUS;
 
 long int  WifiTicks   = 0 ;    // when this variable reaches a multiple of 2000 it means that approx 10 secs have passed 
@@ -20,7 +18,7 @@ char pass[]   = "password";       // password for the hotspot
 
 AsyncUDP udp;
 
-void SetupWifi()
+void InitializeWifi()
 {
     digitalWrite( RedLed , HIGH );
     WiFi.mode(WIFI_STA);
@@ -37,7 +35,6 @@ void SetupWifi()
     // Connect to WPA/WPA2 network
     
   }
-  WifiSetupStatus=1;
 
   digitalWrite( RedLed , LOW );
   digitalWrite( GreenLed , HIGH );

@@ -8,13 +8,12 @@ sensors_event_t orientationData , angVelocityData , linearAccelData, magnetomete
 uint8_t sys, gyro, accel, mag = 0;
 
 Adafruit_BNO055 bno  = Adafruit_BNO055(55, 0x28, &Wire);
-void SetupBNO()
+void InitializeBNO()
 {
       while(! bno.begin())
     {
-
     }
-
+    
 }
 void CalibrateBNO()
 {  
@@ -47,4 +46,5 @@ void UpdateBNOData()
   SensorData.MagX = magnetometerData.magnetic.x * 100;
   SensorData.MagY = magnetometerData.magnetic.y * 100;
   SensorData.MagZ = magnetometerData.magnetic.z * 100;
+  
 }
