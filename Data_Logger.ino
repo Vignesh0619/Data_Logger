@@ -158,9 +158,7 @@ bool UpdateSensorData(struct repeating_timer *rt){
    SensorData.RTDTemp =DUMMY_VAL * 10  ;
   }
 
-
   SensorData.Time = getTimeStamp();
-
   
   if( WiFi.status() == WL_CONNECTED && digitalRead(RedLed) )
   {
@@ -168,7 +166,7 @@ bool UpdateSensorData(struct repeating_timer *rt){
     digitalWrite( GreenLed , HIGH );
   }
   SensorData.Counter= counter;
-  if(counter == 50)
+  if(counter == 10)
      counter=0;
   counter++;
       
@@ -193,7 +191,7 @@ bool WifiStatusCheck( struct repeating_timer *rt){
 
 void setup() {
  
-  InitializeCOM();        //
+  InitializeCOM();        
   InitializeSwitch();     //initializing switch
   ReadSwitch();      //reading switch position
   InitializeLED();
